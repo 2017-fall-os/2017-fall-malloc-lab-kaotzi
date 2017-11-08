@@ -251,21 +251,56 @@ void freeRegion(void *r) {
    TODO: if the successor 's' to r's block is free, and there is sufficient space
    in r + s, then just adjust sizes of r & s.
 */
-void *resizeRegion(void *r, size_t newSize) {
-  int oldSize;
-  if (r != (void *)0)		/* old region existed */
-    oldSize = computeUsableSpace(regionToPrefix(r));
-  else
-    oldSize = 0;		/* non-existant regions have size 0 */
-  if (oldSize >= newSize)	/* old region is big enough */
-    return r;
-  else {			/* allocate new region & copy old data */
-    char *o = (char *)r;	/* treat both regions as char* */
+void *resizeRegion(void *r, size_t newSize) 
+  {
+    int oldSize;
+    void *oldPrefix= regionToPrefix(r);
+    if (r != (void *)0)
+    {		/* old region existed */
+      oldPrefix= regionToPrefix(r);
+      oldSize = computeUsableSpace(oldPrefix);
+    }else{
+      oldSize = 0;
+    }		/* non-existant regions have size 0 */
+    if (oldSize >= newSize)	/* old region is big enough */
+      return r;
+    else {			/* allocate new region & copy old data */
+//////////////////////////first we check if we can just use the adjacent area
+          void *nextPrefix = getNextPrefix(regionToPrefix(r));
+          int nextRSize = 0;
+          if(nextPrefix!=NULL)
+            nextRSize=computeUsableSpace(nextPrefix);
+          if(nextRSize>0)
+            {
+              if((oldSize+nextRSize>=newSize)&&(regionToPrefix(r)->allocated==0))//adjust for headers?
+              {
+                int remainingSize= newSize-oldSize;
+                if(remainingSize>=nextRSize)//adjust for headers?
+                {
+                   /*
+  BlockPrefix_t *p = addr;
+  void *limitAddr = addr + size;
+
+
+  BlockSuffix_t *s = limitAddr - align8(sizeof(BlockSuffix_t));
+  p->suffix = s;
+  s->prefix = p;
+                   */ 
+                }
+            
+              }
+
+            }else{
+
+            }
+    
+
+    char *oldRegion = (char *)r;	/* treat both regions as char* */
     char *n = (char *)firstFitAllocRegion(newSize); 
     int i;
     for (i = 0; i < oldSize; i++) /* copy byte-by-byte, should use memcpy */
-      n[i] = o[i];
-    freeRegion(o);		/* free old region */
+      n[i] = oldRegion[i];
+    freeRegion(oldRegion);		/* free old region */
     return (void *)n;
   }
 }
