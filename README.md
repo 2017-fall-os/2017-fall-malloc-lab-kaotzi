@@ -12,12 +12,11 @@ resizeRegion checks to see if the region needs to be expanded. It then checks th
 myAllocatorTest1.c was modified to successfully run testing of this program.
 
 ## Special Thanks to:
-Chris Tarango
-Jesus Padilla
-Geoni Griffin
-Ricardo Alvarez
-and 
-Adrian Veliz
+* Chris Tarango
+* Jesus Padilla
+* Geoni Griffin
+* Ricardo Alvarez and 
+* Adrian Veliz
 
 ...for their aide with concept clarification, code review, and in general, their help!
 
