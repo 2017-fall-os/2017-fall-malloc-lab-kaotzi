@@ -2,13 +2,15 @@
 #define myAllocator_H
 
 /* block prefix & suffix */
-typedef struct BlockPrefix_s {
-  struct BlockSuffix_s *suffix;
-  int allocated;
+typedef struct BlockPrefix_s
+{
+    struct BlockSuffix_s *suffix;
+    int allocated;
 } BlockPrefix_t;
 
-typedef struct BlockSuffix_s {
-  struct BlockPrefix_s *prefix;
+typedef struct BlockSuffix_s
+{
+    struct BlockPrefix_s *prefix;
 } BlockSuffix_t;
 
 BlockPrefix_t *findNextFit(size_t s);

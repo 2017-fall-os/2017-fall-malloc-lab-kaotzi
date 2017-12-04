@@ -271,21 +271,22 @@ void *firstFitAllocRegion(size_t s)
 BlockPrefix_t *findNextFit(size_t s)  	/* find first block with usable space > s */
 {
     BlockPrefix_t *p = arenaFrame;
-    
+
     do
     {
         arenaFrame = p;
         if (!p->allocated && computeUsableSpace(p) >= s)
-            {
-              stopPoint = p;
-              return p;
-            }
+        {
+            stopPoint = p;
+            return p;
+        }
         p = getNextPrefix(p);
         if(!p)
         {
-          p = arenaBegin;
+            p = arenaBegin;
         }
-    }while(p!= stopPoint);
+    }
+    while(p!= stopPoint);
     return growArena(s);
 }
 
@@ -353,35 +354,35 @@ void *resizeRegion(void *r, size_t newSize)
     if (oldSize >= newSize)	/* old region is big enough */
         return r;
 
-/* allocate new region & copy old data
-first we check if we can just use the adjacent area*/
-        BlockPrefix_t *nextPrefix = getNextPrefix(regionToPrefix(r));
-        int nextRSize = 0;
-        if(nextPrefix!=NULL)
-            nextRSize=computeUsableSpace(nextPrefix);
-        if(nextRSize>0)
+    /* allocate new region & copy old data
+    first we check if we can just use the adjacent area*/
+    BlockPrefix_t *nextPrefix = getNextPrefix(regionToPrefix(r));
+    int nextRSize = 0;
+    if(nextPrefix!=NULL)
+        nextRSize=computeUsableSpace(nextPrefix);
+    if(nextRSize>0)
+    {
+        if((oldSize+nextRSize>=newSize)&&(nextPrefix->allocated==0))
         {
-            if((oldSize+nextRSize>=newSize)&&(nextPrefix->allocated==0))
+            int remainingSize= newSize-oldSize;
+            if(remainingSize<=nextRSize)
             {
-                int remainingSize= newSize-oldSize;
-                if(remainingSize<=nextRSize)
-                {
 
-                     oldPrefix->allocated = 0;
-                     BlockPrefix_t *tmp = coalescePrev(nextPrefix);
-		     tmp->allocated = 1;
-		     return tmp;
-                }
-
+                oldPrefix->allocated = 0;
+                BlockPrefix_t *tmp = coalescePrev(nextPrefix);
+                tmp->allocated = 1;
+                return tmp;
             }
 
         }
 
-        char *oldRegion = (char *)r;	/* treat both regions as char* */
-        char *n = (char *)nextFitAllocRegion(newSize);
-        memcpy(n,oldRegion,oldSize);
-        freeRegion(oldRegion);		/* free old region */
-        return (void *)n;
+    }
+
+    char *oldRegion = (char *)r;	/* treat both regions as char* */
+    char *n = (char *)nextFitAllocRegion(newSize);
+    memcpy(n,oldRegion,oldSize);
+    freeRegion(oldRegion);		/* free old region */
+    return (void *)n;
 
 }
 
