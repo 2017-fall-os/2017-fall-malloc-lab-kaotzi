@@ -11,6 +11,8 @@ typedef struct BlockSuffix_s {
   struct BlockPrefix_s *prefix;
 } BlockSuffix_t;
 
+BlockPrefix_t *findNextFit(size_t s);
+void *nextFitAllocRegion(size_t s);
 void arenaCheck(void);
 void *firstFitAllocRegion(size_t s);
 void freeRegion(void *r);
